@@ -64,10 +64,10 @@ $body   = json_decode(file_get_contents('php://input'), true) ?: [];
 route('GET', '/dump', function () {
     $d = [];
     $d['traders']   = q('SELECT Trader_ID id, Trader_Name name, Email email, Phone phone, Address address FROM Trader ORDER BY Trader_ID');
-    $d['items']     = q('SELECT Item_ID id, ItemName name, ItemType item_type, Series series, Description description, Listing_ID listing_id, Image image FROM Items ORDER BY Item_ID');
+    $d['items']     = q('SELECT Item_ID id, ItemName name, ItemType item_type, Series series, Description description, Listing_ID listing_id FROM Items ORDER BY Item_ID');
     $d['cards']     = q('SELECT Item_ID item_id, Rarity rarity, CardType card_type FROM Card');
     $d['boxsets']   = q('SELECT Item_ID item_id, ReleaseDate release_date, TotalCards total_cards FROM Boxset');
-    $d['gachas']    = nums(q('SELECT Gacha_ID id, Name name, LOWER(Status) status, Price price, Stock stock, Image image FROM Gacha ORDER BY Gacha_ID'), ['price']);
+    $d['gachas']    = nums(q('SELECT Gacha_ID id, Name name, LOWER(Status) status, Price price, Stock stock FROM Gacha ORDER BY Gacha_ID'), ['price']);
     $d['listings']  = nums(q('SELECT Listing_ID id, Trader_ID trader_id, Order_ID order_id, price FROM Listing ORDER BY Listing_ID'), ['price']);
     $d['orders']    = nums(q('SELECT Order_ID id, Trader_ID trader_id, DATE(orderDate) order_date, total_amount, LOWER(Status) status FROM Orders ORDER BY Order_ID'), ['total_amount']);
     $pay = nums(q('SELECT Order_ID order_id, LOWER(payment_status) payment_status, amount, DATE(payment_date) payment_date, method FROM Payment'), ['amount']);
@@ -129,8 +129,8 @@ function checkItem($f) {
 route('POST', '/items', function ($m, $b) {
     checkItem($b);
     return ['id' => tx(function () use ($b) {
-        run('INSERT INTO Items (Listing_ID,ItemType,ItemName,Series,Description,Image) VALUES (NULL,?,?,?,?,?)',
-            [$b['item_type'], s($b['name']), s($b['series'] ?? null), s($b['description'] ?? null), $b['image'] ?? null]);
+        run('INSERT INTO Items (Listing_ID,ItemType,ItemName,Series,Description) VALUES (NULL,?,?,?,?)',
+            [$b['item_type'], s($b['name']), s($b['series'] ?? null), s($b['description'] ?? null)]);
         $id = newId();
         writeSubtype($id, $b);
         return $id;
@@ -141,8 +141,8 @@ route('PUT', '/items/(\d+)', function ($m, $b) {
     tx(function () use ($m, $b) {
         run('DELETE FROM Card WHERE Item_ID=?', [$m[1]]);          // subtype row must go before ItemType may change
         run('DELETE FROM Boxset WHERE Item_ID=?', [$m[1]]);
-        run('UPDATE Items SET ItemType=?,ItemName=?,Series=?,Description=?,Image=COALESCE(?,Image) WHERE Item_ID=?',
-            [$b['item_type'], s($b['name']), s($b['series'] ?? null), s($b['description'] ?? null), $b['image'] ?? null, $m[1]]);
+        run('UPDATE Items SET ItemType=?,ItemName=?,Series=?,Description=? WHERE Item_ID=?',
+            [$b['item_type'], s($b['name']), s($b['series'] ?? null), s($b['description'] ?? null), $m[1]]);
         writeSubtype((int) $m[1], $b);
     });
     return ['ok' => true];
@@ -171,12 +171,12 @@ function gachaFields($b) {
 }
 route('POST', '/gachas', function ($m, $b) {
     [$n, $st, $pr, $sk] = gachaFields($b);
-    run('INSERT INTO Gacha (Name,Status,Price,Stock,Image) VALUES (?,?,?,?,?)', [$n, $st, $pr, $sk, $b['image'] ?? null]);
+    run('INSERT INTO Gacha (Name,Status,Price,Stock) VALUES (?,?,?,?)', [$n, $st, $pr, $sk]);
     return ['id' => newId()];
 });
 route('PUT', '/gachas/(\d+)', function ($m, $b) {
     [$n, $st, $pr, $sk] = gachaFields($b);
-    run('UPDATE Gacha SET Name=?,Status=?,Price=?,Stock=?,Image=COALESCE(?,Image) WHERE Gacha_ID=?', [$n, $st, $pr, $sk, $b['image'] ?? null, $m[1]]);
+    run('UPDATE Gacha SET Name=?,Status=?,Price=?,Stock=? WHERE Gacha_ID=?', [$n, $st, $pr, $sk, $m[1]]);
     return ['ok' => true];
 });
 route('DELETE', '/gachas/(\d+)', function ($m) {
@@ -215,7 +215,7 @@ route('POST', '/gachas/(\d+)/open', function ($m, $b) {
         run('INSERT INTO Own (Trader_ID,Item_ID,quantity) VALUES (?,?,1) ON DUPLICATE KEY UPDATE quantity=quantity+1', [$tid, $win]);
         return $win;
     });
-    return one('SELECT Item_ID id, ItemName name, Image image FROM Items WHERE Item_ID=?', [$won]);
+    return one('SELECT Item_ID id, ItemName name FROM Items WHERE Item_ID=?', [$won]);
 });
 
 // =====================================================================
