@@ -4,11 +4,8 @@ Setup
 
 2. Import the database. Open http://localhost/phpmyadmin, go to the Import tab, and import these files in order:
 
-salty.sql (this creates the card_marketplace database)
+new_salty.sql (this creates the card_marketplace database)
 Insert_info_salty_project.sql (mock data, optional)
-schema_patch.sql
-
-The patch is required: without it, a listing can’t exist before it is ordered, so the shop flow breaks. It also adds the Payment.method, Shipment.address and Image columns.
 
 3. Copy the app. Copy the gachamart folder to C:\xampp\htdocs\gachamart\. It holds three files:
 
