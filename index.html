@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salty Compendium</title>
+<link rel="icon" href="logo.png">
+<style>
+:root{--bg:#f4f8f8;--card:#fff;--ink:#17252a;--mut:#60757a;--pri:#0e7c86;--pri2:#2fa4ad;--line:#d8e6e8;--ok:#1f9d6b;--bad:#d64561}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+a{color:var(--pri);text-decoration:none;cursor:pointer}a:hover{text-decoration:underline}
+header{background:linear-gradient(90deg,#0b3d4a,var(--pri));color:#fff;padding:0 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+header .brand{font-weight:700;font-size:20px;padding:8px 0;color:#fff;display:flex;align-items:center;gap:10px}
+header .brand img{height:48px;width:auto;display:block}
+header nav a{color:#d9f1f2;padding:16px 10px;display:inline-block}
+header nav a:hover,header nav a.on{background:rgba(255,255,255,.18);text-decoration:none}
+#shop{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:14px}
+#shop select{width:auto;padding:6px 8px;background:#fff}
+#shop .cart{background:#fff;color:var(--pri);padding:7px 14px;border-radius:99px;font-weight:600;white-space:nowrap}
+#shop .cart:hover{text-decoration:none;background:#e8f6f6}
+main{max-width:1100px;margin:24px auto;padding:0 16px 60px}
+h1{margin:0 0 4px}h2{margin:28px 0 10px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:block;color:inherit}
+a.card:hover{text-decoration:none;box-shadow:0 4px 14px rgba(14,124,134,.15)}
+.card .body{padding:12px 14px}
+.thumb{aspect-ratio:1/1;background:#e3f0f1;display:flex;align-items:center;justify-content:center;font-size:48px;color:#9bbdc0}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+.stats .panel{margin:0;text-align:center}.stats b{font-size:28px;display:block;color:var(--pri)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{background:#e9f2f3;font-size:13px;color:var(--mut)}
+img.mini,span.mini{width:44px;height:44px;object-fit:cover;border-radius:8px;vertical-align:middle;margin-right:8px;display:inline-flex;align-items:center;justify-content:center;background:#e3f0f1;font-size:22px}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.inline{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.inline>*{flex:1;min-width:120px}.inline>button{flex:0;white-space:nowrap}
+button,.btn{background:var(--pri);color:#fff;border:0;padding:9px 16px;border-radius:8px;cursor:pointer;font:inherit;display:inline-block}
+button:hover,.btn:hover{background:var(--pri2);text-decoration:none}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost,button.ghost{background:#e3f0f1;color:var(--pri)}
+button.danger{background:var(--bad)}
+button.sm{padding:6px 12px;font-size:14px}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:#e3f0f1;color:var(--pri)}
+.tag.ok{background:#dcf5ea;color:var(--ok)}.tag.warn{background:#fdecc8;color:#9a6b00}
+.mut{color:var(--mut);font-size:13px}
+.preview{max-width:180px;border-radius:10px;margin-top:8px;display:none}
+.check{display:flex;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;background:#fff;color:var(--ink);font-size:inherit;margin-top:0}
+.check input{width:auto}
+.bar-prob{height:8px;background:#e3f0f1;border-radius:99px;overflow:hidden;min-width:80px}
+.bar-prob i{display:block;height:100%;background:var(--pri)}
+.two{display:grid;grid-template-columns:240px 1fr;gap:20px}
+.cartgrid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+.sum{display:flex;justify-content:space-between;padding:6px 0}.sum.total{font-size:20px;font-weight:700;border-top:1px solid var(--line);margin-top:8px;padding-top:12px}
+.btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+@media(max-width:760px){.two,.row,.cartgrid{grid-template-columns:1fr}#shop{margin-left:0}}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#17252a;color:#fff;padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+#toast.show{opacity:1}
+.win{background:linear-gradient(135deg,#e8f6f6,#fff);border:2px solid var(--pri);text-align:center}
+.win .thumb{max-width:180px;margin:8px auto;border-radius:12px;overflow:hidden}
+footer{max-width:1100px;margin:0 auto 30px;padding:0 16px;display:flex;gap:8px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="#/"><img src="https://cdn.discordapp.com/attachments/1557947168885579796/1559856511675793508/tcg_logo_transparent.png?ex=6ad09915&is=6acf4795&hm=b40f0f95fda4cf847753ea6a5aa9308c9f1bf26133bac5fed324ffaeff4b5e1d" alt="TCG"> Salty Compendium</a>
+  <nav id="nav">
+    <a href="#/items" data-k="items">Items</a>
+    <a href="#/gachas" data-k="gachas">Gacha</a>
+    <a href="#/listings" data-k="listings">Listings</a>
+    <a href="#/orders" data-k="orders">Orders</a>
+    <a href="#/traders" data-k="traders">Traders</a>
+  </nav>
+  <div id="shop"></div>
+</header>
+<main id="app"></main>
+<footer>
+  <button class="ghost" onclick="C.exportData()">Export JSON</button>
+</footer>
+<div id="toast"></div>
+
+<script>
+/* =====================================================================
+   MODEL — read-only cache of the database (loaded from api/dump).
+   Writes go through the PHP API (see Controller); the cart and "Shopping as"
+   choice live in this browser only.
+   ===================================================================== */
+const Model = (() => {
+  const LKEY = 'gachamart_local';
+  const TABLES = ['traders','items','cards','boxsets','gachas','listings','orders','payments','shipments','own','includes','opens'];
+  let db = {}; TABLES.forEach(t => db[t] = []);
+  let local = {cart:{}, buyer:null};
+
+  async function load(){
+    const r = await fetch('api/dump'); let d = null;
+    try { d = await r.json(); } catch(e) { throw new Error('The server did not return JSON. Check that api.php and .htaccess are in this folder and Apache is running.'); }
+    if (!r.ok) throw new Error(d.error || 'Server error');
+    TABLES.forEach(t => d[t] = d[t] || []); db = d;
+  }
+  function loadLocal(){ try { Object.assign(local, JSON.parse(localStorage.getItem(LKEY)) || {}); } catch(e){} local.cart = local.cart || {}; }
+  const saveLocal = () => { try { localStorage.setItem(LKEY, JSON.stringify(local)); } catch(e){} };
+  const find = (t, k, v) => db[t].find(r => r[k] === v);
+
+  const Trader = {
+    all: () => [...db.traders].sort((a,b)=>a.name.localeCompare(b.name)),
+    get: id => find('traders','id',id),
+    inventory: tid => db.own.filter(o=>o.trader_id===tid && o.quantity>0).map(o=>({...Item.get(o.item_id), quantity:o.quantity})),
+    owners: iid => db.own.filter(o=>o.item_id===iid&&o.quantity>0).map(o=>({...Trader.get(o.trader_id), quantity:o.quantity})),
+    opens: tid => db.opens.filter(o=>o.trader_id===tid).reverse().map(o=>({...o, gacha:Gacha.get(o.gacha_id), item:Item.get(o.result_item)})),
+  };
+
+  // Items = supertype ; Card / Boxset = subtypes (disjoint)
+  const Item = {
+    all: type => db.items.filter(i=>!type||i.item_type===type).map(Item.join).reverse(),
+    join: i => ({...i, ...(find('cards','item_id',i.id)||{}), ...(find('boxsets','item_id',i.id)||{}), id:i.id}),
+    get: id => { const i=find('items','id',id); return i?Item.join(i):null; },
+  };
+
+  const Gacha = {
+    all: () => [...db.gachas].reverse(),
+    get: id => find('gachas','id',id),
+    includes: gid => db.includes.filter(x=>x.gacha_id===gid).map(x=>({...Item.get(x.item_id), probability:x.probability})).sort((a,b)=>b.probability-a.probability),
+    history: gid => db.opens.filter(o=>o.gacha_id===gid).slice(-20).reverse().map(o=>({...o,trader:Trader.get(o.trader_id),item:Item.get(o.result_item)})),
+  };
+
+  const Listing = {
+    all: openOnly => db.listings.filter(l=>!openOnly||!l.order_id).map(Listing.join).reverse(),
+    join: l => ({...l, seller:Trader.get(l.trader_id), items:Listing.items(l.id)}),
+    items: lid => db.items.filter(i=>i.listing_id===lid),
+    sellable: tid => db.own.filter(o=>o.trader_id===tid&&o.quantity>0).map(o=>({...Item.get(o.item_id),quantity:o.quantity}))
+      .filter(i=>{ const l=find('listings','id',i.listing_id); return !i.listing_id || (l&&l.order_id); }),
+  };
+
+  // ---- Shopping cart (one cart per buyer, kept in this browser) ----
+  const Cart = {
+    ids: tid => local.cart[tid] || [],
+    has: (tid,lid) => Cart.ids(tid).includes(lid),
+    list: tid => Cart.ids(tid).map(id=>find('listings','id',id)).filter(l=>l && !l.order_id && l.trader_id!==tid).map(Listing.join),
+    count: tid => tid ? Cart.list(tid).length : 0,
+    total: tid => Cart.list(tid).reduce((s,l)=>s+l.price,0),
+    add(tid,lid){
+      if(!tid) throw new Error('Choose who is shopping first (top right).');
+      const l=find('listings','id',lid);
+      if(!l||l.order_id) throw new Error('This listing is no longer available.');
+      if(l.trader_id===tid) throw new Error("You can't buy your own listing.");
+      if(Cart.has(tid,lid)) throw new Error('Already in your cart.');
+      (local.cart[tid]=local.cart[tid]||[]).push(lid); saveLocal();
+    },
+    remove(tid,lid){ local.cart[tid]=Cart.ids(tid).filter(x=>x!==lid); saveLocal(); },
+    clear(tid){ local.cart[tid]=[]; saveLocal(); },
+  };
+
+  const Order = {
+    all: () => db.orders.map(o=>({...o, trader:Trader.get(o.trader_id), pay:Order.payment(o.id), ship:Order.shipment(o.id)})).reverse(),
+    get: id => { const o=find('orders','id',id); return o&&{...o,trader:Trader.get(o.trader_id)}; },
+    listings: oid => db.listings.filter(l=>l.order_id===oid).map(Listing.join),
+    payment: id => find('payments','order_id',id),
+    shipment: id => find('shipments','order_id',id),
+  };
+
+  const stats = () => ({traders:db.traders.length, items:db.items.length, gachas:db.gachas.length,
+                        listings:db.listings.filter(l=>!l.order_id).length, orders:db.orders.length});
+  const buyer = () => db.traders.some(t=>t.id===local.buyer) ? local.buyer : null;
+  return { load, loadLocal, Trader, Item, Gacha, Listing, Cart, Order, stats,
+           raw:()=>db, buyer, setBuyer(id){ local.buyer=id; saveLocal(); } };
+})();
+
+/* =====================================================================
+   VIEW — builds HTML from data (no business rules)
+   ===================================================================== */
+const View = (() => {
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const money = v => (+v||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' ฿';
+  const pic = (img, cls='', icon='🎴') => img ? `<img class="${cls}" src="${img}" alt="">` : `<span class="${cls}">${icon}</span>`;
+  const opts = (arr, val, label, sel) => arr.map(x=>`<option value="${esc(val(x))}" ${String(val(x))===String(sel)?'selected':''}>${esc(label(x))}</option>`).join('');
+  const names = items => items.map(i=>esc(i.name)).join(', ');
+  const cover = l => (l.items.find(i=>i.image)||{}).image;
+  const imageInput = cur => `
+    <label>Product image (png, jpg, gif, webp — resized automatically)</label>
+    <input type="file" accept="image/*" onchange="C.pickImage(this)">
+    <img id="preview" class="preview" alt="" ${cur?`src="${cur}" style="display:block"`:''}>`;
+
+  const shop = (traders, buyer, count) => `
+    <label style="margin:0;color:#d9f1f2">Shopping as</label>
+    <select onchange="C.setBuyer(this.value)"><option value="">— choose —</option>${opts(traders,t=>t.id,t=>t.name,buyer)}</select>
+    <a class="cart" href="#/cart">🛒 Cart (${count})</a>`;
+
+  const home = (s, latest) => `
+    <h1>Salty Compendium</h1><p class="mut">A marketplace for trading cards and boxsets, with gacha machines.</p>
+    <div class="stats">
+      <div class="panel"><b>${s.traders}</b>Traders</div><div class="panel"><b>${s.items}</b>Items</div>
+      <div class="panel"><b>${s.gachas}</b>Gacha machines</div><div class="panel"><b>${s.listings}</b>Open listings</div>
+      <div class="panel"><b>${s.orders}</b>Orders</div></div>
+    <div class="bar"><h2>Latest items</h2><a class="btn" href="#/items/new">+ Add item</a></div>
+    <div class="grid">${latest.map(itemCard).join('') || '<p class="mut">No items yet — add one with a photo.</p>'}</div>`;
+
+  const itemCard = i => `
+    <a class="card" href="#/items/${i.id}"><div class="thumb">${pic(i.image)}</div>
+      <div class="body"><b>${esc(i.name)}</b><br><span class="tag">${i.item_type}</span>
+      ${i.rarity?`<span class="tag warn">${esc(i.rarity)}</span>`:''}<div class="mut">${esc(i.series)}</div></div></a>`;
+
+  const items = list => `
+    <div class="bar"><h1>Items</h1><div>
+      <a class="btn ghost" href="#/items">All</a> <a class="btn ghost" href="#/items?type=Card">Cards</a>
+      <a class="btn ghost" href="#/items?type=Boxset">Boxsets</a> <a class="btn" href="#/items/new">+ Add item</a></div></div>
+    <div class="grid">${list.map(itemCard).join('') || '<p class="mut">No items yet.</p>'}</div>`;
+
+  const itemForm = it => { it = it || {item_type:'Card'}; return `
+    <h1>${it.id?'Edit item':'Add item'}</h1>
+    <form class="panel" onsubmit="return C.saveItem(event,${it.id||0})">
+      <div class="row"><div><label>Name *</label><input name="name" required value="${esc(it.name)}"></div>
+        <div><label>Type (subtype)</label><select name="item_type" onchange="C.toggleType(this.form)">
+          <option ${it.item_type==='Card'?'selected':''}>Card</option><option ${it.item_type==='Boxset'?'selected':''}>Boxset</option></select></div></div>
+      <label>Series</label><input name="series" value="${esc(it.series)}">
+      <label>Description</label><textarea name="description" rows="3">${esc(it.description)}</textarea>
+      <div id="card-fields" class="row"><div><label>Rarity</label><input name="rarity" value="${esc(it.rarity)}" placeholder="e.g. SSR, Rare"></div>
+        <div><label>Card type</label><input name="card_type" value="${esc(it.card_type)}"></div></div>
+      <div id="box-fields" class="row"><div><label>Release date</label><input type="date" name="release_date" value="${esc(it.release_date)}"></div>
+        <div><label>Total cards</label><input type="number" min="0" name="total_cards" value="${esc(it.total_cards)}"></div></div>
+      ${imageInput(it.image)}
+      <p><button>Save</button> <a class="btn ghost" href="#/items">Cancel</a></p></form>`; };
+
+  const itemShow = (it, owners, gachas) => `
+    <div class="bar"><h1>${esc(it.name)} <span class="tag">${it.item_type}</span></h1><div>
+      <a class="btn" href="#/items/${it.id}/edit">Edit</a> <button class="danger" onclick="C.deleteItem(${it.id})">Delete</button></div></div>
+    <div class="panel two"><div class="card"><div class="thumb">${pic(it.image)}</div></div><div>
+      <p>${esc(it.description)||'—'}</p><p class="mut">Series: ${esc(it.series)||'—'}</p>
+      ${it.item_type==='Card'?`<p>Rarity: <b>${esc(it.rarity)||'—'}</b> · Card type: <b>${esc(it.card_type)||'—'}</b></p>`
+        :`<p>Release: <b>${esc(it.release_date)||'—'}</b> · Total cards: <b>${esc(it.total_cards)||'—'}</b></p>`}</div></div>
+    <h2>Owners</h2><table><tr><th>Trader</th><th>Quantity</th></tr>
+      ${owners.map(o=>`<tr><td><a href="#/traders/${o.id}">${esc(o.name)}</a></td><td>${o.quantity}</td></tr>`).join('')||'<tr><td colspan=2 class="mut">Nobody owns this yet.</td></tr>'}</table>
+    <h2>In gacha machines</h2><table><tr><th>Machine</th><th>Probability (%)</th></tr>
+      ${gachas.map(g=>`<tr><td><a href="#/gachas/${g.id}">${esc(g.name)}</a></td><td>${g.probability}</td></tr>`).join('')||'<tr><td colspan=2 class="mut">Not in any machine.</td></tr>'}</table>`;
+
+  const gachas = list => `
+    <div class="bar"><h1>Gacha machines</h1><a class="btn" href="#/gachas/new">+ New machine</a></div>
+    <div class="grid">${list.map(g=>`<a class="card" href="#/gachas/${g.id}"><div class="thumb">${pic(g.image,'','🎰')}</div>
+      <div class="body"><b>${esc(g.name)}</b><br>${money(g.price)} · ${g.stock} left
+      <span class="tag ${g.status==='active'?'ok':''}">${g.status}</span></div></a>`).join('')||'<p class="mut">No gacha machines yet.</p>'}</div>`;
+
+  const gachaForm = g => { g=g||{price:0,stock:0,status:'active'}; return `
+    <h1>${g.id?'Edit gacha machine':'New gacha machine'}</h1>
+    <form class="panel" onsubmit="return C.saveGacha(event,${g.id||0})">
+      <label>Name *</label><input name="name" required value="${esc(g.name)}">
+      <div class="row"><div><label>Price per spin</label><input type="number" step="0.01" min="0" name="price" value="${g.price}"></div>
+        <div><label>Stock</label><input type="number" min="0" name="stock" value="${g.stock}"></div></div>
+      <label>Status</label><select name="status"><option ${g.status==='active'?'selected':''}>active</option><option ${g.status==='inactive'?'selected':''}>inactive</option></select>
+      ${imageInput(g.image)}
+      <p><button>Save</button> <a class="btn ghost" href="#/gachas">Cancel</a></p></form>`; };
+
+  const gachaShow = (g, inc, allItems, traders, hist, win) => {
+    const total = inc.reduce((s,i)=>s+i.probability,0) || 1;
+    return `
+    <div class="bar"><h1>${esc(g.name)} <span class="tag ${g.status==='active'?'ok':''}">${g.status}</span></h1><div>
+      <a class="btn" href="#/gachas/${g.id}/edit">Edit</a> <button class="danger" onclick="C.deleteGacha(${g.id})">Delete</button></div></div>
+    <div class="panel two" style="grid-template-columns:220px 1fr"><div class="card"><div class="thumb">${pic(g.image,'','🎰')}</div></div><div>
+      <p>Price <b>${money(g.price)}</b> per spin · <b>${g.stock}</b> in stock</p>
+      <form class="inline" onsubmit="return C.openGacha(event,${g.id})">
+        <div><label>Who is spinning?</label><select name="trader_id" required>${opts(traders,t=>t.id,t=>t.name,Model.buyer())}</select></div>
+        <button ${traders.length?'':'disabled'}>🎰 Spin</button></form>
+      ${traders.length?'':'<p class="mut">Create a trader first.</p>'}</div></div>
+    ${win?`<div class="panel win"><b>🎉 ${esc(win.trader)} got</b><div class="thumb">${pic(win.item.image)}</div><h3>${esc(win.item.name)}</h3></div>`:''}
+    <h2>Items in this machine</h2>
+    <table><tr><th>Item</th><th>Probability (%)</th><th>Chance</th><th></th></tr>
+    ${inc.map(i=>{const p=(i.probability/total*100).toFixed(1);return `<tr><td><a href="#/items/${i.id}">${pic(i.image,'mini')}${esc(i.name)}</a></td><td>${i.probability}</td>
+      <td><div class="bar-prob"><i style="width:${p}%"></i></div>${p}%</td>
+      <td><button class="ghost sm" onclick="C.removeInclude(${g.id},${i.id})">Remove</button></td></tr>`}).join('')||'<tr><td colspan=4 class="mut">No items in this machine yet.</td></tr>'}</table>
+    <form class="panel inline" style="margin-top:12px" onsubmit="return C.addInclude(event,${g.id})">
+      <div><label>Add / update item</label><select name="item_id">${opts(allItems,i=>i.id,i=>`${i.name} (${i.item_type})`)}</select></div>
+      <div><label>Probability (%)</label><input type="number" step="0.01" min="0.01" name="probability" value="10"></div><button>Save</button></form>
+    <h2>Recent spins</h2><table><tr><th>Trader</th><th>Result</th><th>Time</th></tr>
+    ${hist.map(h=>`<tr><td>${esc(h.trader?.name)}</td><td>${esc(h.item?.name)||'—'}</td><td>${esc(h.date_opened)}</td></tr>`).join('')||'<tr><td colspan=3 class="mut">Nobody has spun yet.</td></tr>'}</table>`; };
+
+  const traders = list => `
+    <div class="bar"><h1>Traders</h1><a class="btn" href="#/traders/new">+ Add trader</a></div>
+    <table><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Address</th></tr>
+    ${list.map(t=>`<tr><td>${t.id}</td><td><a href="#/traders/${t.id}">${esc(t.name)}</a></td><td>${esc(t.email)}</td><td>${esc(t.phone)}</td><td>${esc(t.address)}</td></tr>`).join('')||'<tr><td colspan=5 class="mut">No traders yet.</td></tr>'}</table>`;
+
+  const traderForm = t => { t=t||{}; return `
+    <h1>${t.id?'Edit trader':'Add trader'}</h1>
+    <form class="panel" onsubmit="return C.saveTrader(event,${t.id||0})">
+      <label>Name *</label><input name="name" required value="${esc(t.name)}">
+      <div class="row"><div><label>Email</label><input type="email" name="email" required value="${esc(t.email)}"></div>
+        <div><label>Phone</label><input name="phone" value="${esc(t.phone)}"></div></div>
+      <label>Address</label><textarea name="address" rows="3">${esc(t.address)}</textarea>
+      <p><button>Save</button> <a class="btn ghost" href="#/traders">Cancel</a></p></form>`; };
+
+  const traderShow = (t, inv, opens, listings, orders, allItems) => `
+    <div class="bar"><h1>${esc(t.name)}</h1><div><a class="btn" href="#/traders/${t.id}/edit">Edit</a>
+      <button class="danger" onclick="C.deleteTrader(${t.id})">Delete</button></div></div>
+    <p class="mut">${esc(t.email)} · ${esc(t.phone)} · ${esc(t.address)}</p>
+    <h2>Inventory</h2>
+    <div class="grid">${inv.map(i=>`<a class="card" href="#/items/${i.id}"><div class="thumb">${pic(i.image)}</div>
+      <div class="body"><b>${esc(i.name)}</b> <span class="tag">× ${i.quantity}</span></div></a>`).join('')||'<p class="mut">Empty — spin a gacha machine, or add items below.</p>'}</div>
+    <form class="panel inline" style="margin-top:12px" onsubmit="return C.addOwn(event,${t.id})">
+      <div><label>Add item to inventory</label><select name="item_id">${opts(allItems,i=>i.id,i=>`${i.name} (${i.item_type})`)}</select></div>
+      <div><label>Quantity</label><input type="number" name="quantity" value="1" min="1"></div><button>Add</button></form>
+    <h2>Gacha history</h2><table><tr><th>Machine</th><th>Result</th><th>Time</th></tr>
+    ${opens.map(o=>`<tr><td>${o.gacha?`<a href="#/gachas/${o.gacha.id}">${esc(o.gacha.name)}</a>`:'—'}</td><td>${o.item?pic(o.item.image,'mini')+esc(o.item.name):'—'}</td><td>${esc(o.date_opened)}</td></tr>`).join('')||'<tr><td colspan=3 class="mut">No spins yet.</td></tr>'}</table>
+    <h2>Listings created</h2><table><tr><th>#</th><th>Price</th><th>Status</th></tr>
+    ${listings.map(l=>`<tr><td>${l.id}</td><td>${money(l.price)}</td><td>${l.order_id?`<span class="tag ok">Sold (Order #${l.order_id})</span>`:'<span class="tag">Open</span>'}</td></tr>`).join('')||'<tr><td colspan=3 class="mut">—</td></tr>'}</table>
+    <h2>Orders placed</h2><table><tr><th>#</th><th>Date</th><th>Total</th><th>Status</th></tr>
+    ${orders.map(o=>`<tr><td><a href="#/orders/${o.id}">#${o.id}</a></td><td>${o.order_date}</td><td>${money(o.total_amount)}</td><td>${o.status}</td></tr>`).join('')||'<tr><td colspan=4 class="mut">—</td></tr>'}</table>`;
+
+  const listings = (list, buyer, cart) => `
+    <div class="bar"><h1>Listings</h1><a class="btn" href="#/listings/new">+ Sell items</a></div>
+    <div class="grid">${list.map(l=>{
+      const mine = buyer && l.trader_id===buyer, inCart = cart.includes(l.id);
+      const act = l.order_id ? '' : mine ? '<span class="mut">Your listing</span>'
+        : inCart ? `<a class="btn sm ghost" href="#/cart" style="padding:6px 12px">✓ In cart</a>`
+        : `<button class="sm" onclick="C.addToCart(${l.id})">Add to cart</button> <button class="sm ghost" onclick="C.buyNow(${l.id})">Buy now</button>`;
+      return `<div class="card"><div class="thumb">${pic(cover(l))}</div><div class="body">
+      <b>Listing #${l.id}</b> <span class="tag ${l.order_id?'ok':''}">${l.order_id?'Sold':'Open'}</span><br>
+      <b>${money(l.price)}</b> · by <a href="#/traders/${l.trader_id}">${esc(l.seller?.name)}</a>
+      <div class="mut">${names(l.items)}</div>
+      <div class="btns">${act}${l.order_id?'':(mine||!buyer?` <button class="ghost sm" onclick="C.deleteListing(${l.id})">Delete</button>`:'')}</div></div></div>`;}).join('')||'<p class="mut">No listings yet.</p>'}</div>`;
+
+  const listingForm = (traders, seller, sellable) => `
+    <h1>Sell items</h1>
+    <div class="panel"><label style="margin-top:0">Seller (trader)</label>
+      <select onchange="location.hash='#/listings/new'+(this.value?'?trader='+this.value:'')"><option value="">— choose —</option>${opts(traders,t=>t.id,t=>t.name,seller)}</select></div>
+    ${seller?`<form class="panel" onsubmit="return C.saveListing(event,${seller})"><label style="margin-top:0">Pick items from the seller's inventory</label>
+      ${sellable.map(i=>`<label class="check"><input type="checkbox" name="item_ids" value="${i.id}">${pic(i.image,'mini')} ${esc(i.name)} <span class="tag">× ${i.quantity}</span></label>`).join('')
+        ||'<p class="mut">This seller has nothing available to list (add items to inventory or spin a gacha first).</p>'}
+      <label>Total price for this listing (฿)</label><input type="number" step="0.01" min="0" name="price" required>
+      <p><button>Create listing</button> <a class="btn ghost" href="#/listings">Cancel</a></p></form>`:''}`;
+
+  // ---- Cart & checkout ----
+  const cart = (buyer, list, total) => {
+    if (!buyer) return `<h1>Shopping cart</h1><div class="panel"><p>Choose who is shopping using the <b>“Shopping as”</b> menu at the top right.</p>
+      <p class="mut">Add a trader first if there are none: <a href="#/traders/new">+ Add trader</a></p></div>`;
+    if (!list.length) return `<h1>Shopping cart</h1><div class="panel"><p>Your cart is empty.</p><a class="btn" href="#/listings">Browse listings</a></div>`;
+    return `<h1>Shopping cart</h1><p class="mut">Shopping as <b>${esc(buyer.name)}</b></p>
+    <div class="cartgrid"><div>
+      ${list.map(l=>`<div class="panel" style="display:flex;gap:12px;align-items:center">
+        ${pic(cover(l),'mini')}<div style="flex:1"><b>Listing #${l.id}</b> — ${money(l.price)}<br>
+        <span class="mut">${names(l.items)} · seller ${esc(l.seller?.name)}</span></div>
+        <button class="ghost sm" onclick="C.removeFromCart(${l.id})">Remove</button></div>`).join('')}
+      <a href="#/listings">← Continue shopping</a></div>
+      <form class="panel" onsubmit="return C.checkout(event)">
+        <h3 style="margin-top:0">Checkout</h3>
+        <div class="sum"><span>Listings (${list.length})</span><span>${money(total)}</span></div>
+        <div class="sum"><span>Shipping</span><span>Arranged by seller</span></div>
+        <div class="sum total"><span>Total</span><span>${money(total)}</span></div>
+        <label>Shipping address *</label><textarea name="address" rows="3" required>${esc(buyer.address)}</textarea>
+        <label>Payment method</label>
+        <select name="method"><option>Credit / debit card</option><option>Bank transfer</option><option>PromptPay QR</option></select>
+        <label class="check" style="margin-top:12px"><input type="checkbox" name="pay_now" value="1" checked> Pay now (simulated payment)</label>
+        <p class="mut">Paying transfers the items to ${esc(buyer.name)}'s inventory. Leave unchecked to pay later from the order page.</p>
+        <button style="width:100%">Place order</button></form></div>`;
+  };
+
+  const orders = list => `
+    <div class="bar"><h1>Orders</h1><a class="btn" href="#/listings">Go shopping</a></div>
+    <table><tr><th>#</th><th>Buyer</th><th>Date</th><th>Total</th><th>Payment</th><th>Shipment</th><th>Status</th></tr>
+    ${list.map(o=>`<tr><td><a href="#/orders/${o.id}">#${o.id}</a></td><td>${esc(o.trader?.name)}</td><td>${o.order_date}</td><td>${money(o.total_amount)}</td>
+      <td><span class="tag ${o.pay.payment_status==='paid'?'ok':''}">${o.pay.payment_status}</span></td>
+      <td><span class="tag ${o.ship.status==='delivered'?'ok':''}">${o.ship.status}</span></td><td>${o.status}</td></tr>`).join('')||'<tr><td colspan=7 class="mut">No orders yet.</td></tr>'}</table>`;
+
+  const orderShow = (o, ls, pay, ship) => `
+    <h1>Order #${o.id} <span class="tag ${o.status==='completed'||o.status==='paid'?'ok':''}">${o.status}</span></h1>
+    <p class="mut">Buyer: <a href="#/traders/${o.trader_id}">${esc(o.trader?.name)}</a> · ${o.order_date} · Total <b>${money(o.total_amount)}</b></p>
+    <h2>Listings in this order</h2><table><tr><th>Listing</th><th>Items</th><th>Seller</th><th>Price</th></tr>
+    ${ls.map(l=>`<tr><td>#${l.id}</td><td>${l.items.map(i=>pic(i.image,'mini')+esc(i.name)).join(' ')}</td><td>${esc(l.seller?.name)}</td><td>${money(l.price)}</td></tr>`).join('')}</table>
+    <div class="row" style="margin-top:16px">
+      <form class="panel" onsubmit="return C.savePayment(event,${o.id})"><h3 style="margin-top:0">Payment</h3>
+        <p>Amount ${money(pay.amount)} · Method: ${esc(pay.method)||'—'}<br>Paid on: ${pay.payment_date||'—'}</p>
+        <label>Status</label><select name="payment_status">${['pending','paid','failed','refunded'].map(s=>`<option ${pay.payment_status===s?'selected':''}>${s}</option>`).join('')}</select>
+        <p class="mut">Setting this to “paid” moves the items from the seller to the buyer.</p>
+        <button ${pay.payment_status==='paid'?'disabled':''}>Save payment</button></form>
+      <form class="panel" onsubmit="return C.saveShipment(event,${o.id})"><h3 style="margin-top:0">Shipment</h3>
+        <p class="mut" style="white-space:pre-line">Ship to: ${esc(ship.address)||'—'}</p>
+        <label>Courier</label><input name="courier_name" value="${esc(ship.courier_name)}">
+        <label>Tracking no.</label><input name="tracking_no" value="${esc(ship.tracking_no)}">
+        <label>Status</label><select name="status">${['preparing','shipped','delivered','returned'].map(s=>`<option ${ship.status===s?'selected':''}>${s}</option>`).join('')}</select>
+        <p><button>Save shipment</button></p></form></div>`;
+
+  return { shop, home, items, itemForm, itemShow, gachas, gachaForm, gachaShow, traders, traderForm, traderShow,
+           listings, listingForm, cart, orders, orderShow };
+})();
+
+/* =====================================================================
+   CONTROLLER — routes + form handlers: call Model, pick a View
+   ===================================================================== */
+const C = (() => {
+  const app = document.getElementById('app');
+  let pendingImage = null, lastWin = null;
+  const num = v => +v || 0;
+  const toast = m => { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove('show'),2600); };
+  const go = h => { location.hash = h; };
+  const safe = fn => { try { return fn(); } catch(e){ toast(e.message); return false; } };
+  const fd = e => { e.preventDefault(); return Object.fromEntries(new FormData(e.target)); };
+
+  // ---- Product images: read file -> shrink with canvas -> keep as data URL ----
+  function pickImage(input){
+    const file = input.files[0]; pendingImage = null;
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { toast('Please choose an image file.'); input.value=''; return; }
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const max = 480, k = Math.min(1, max/Math.max(img.width,img.height));
+      const cv = document.createElement('canvas'); cv.width = Math.round(img.width*k); cv.height = Math.round(img.height*k);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      pendingImage = cv.toDataURL(file.type==='image/png'?'image/png':'image/jpeg', .82);
+      const p = document.getElementById('preview'); p.src = pendingImage; p.style.display='block'; URL.revokeObjectURL(url);
+    };
+    img.onerror = () => toast('Could not read that image.');
+    img.src = url;
+  }
+
+  // ---- Router ----
+  const routes = [
+    [/^\/?$/,                    () => View.home(Model.stats(), Model.Item.all().slice(0,6))],
+    [/^\/items$/,                q => View.items(Model.Item.all(q.type))],
+    [/^\/items\/new$/,           () => View.itemForm()],
+    [/^\/items\/(\d+)$/,         (q,id) => { const i=Model.Item.get(+id); if(!i) return null;
+        return View.itemShow(i, Model.Trader.owners(i.id), Model.raw().includes.filter(x=>x.item_id===i.id).map(x=>({...Model.Gacha.get(x.gacha_id),probability:x.probability}))); }],
+    [/^\/items\/(\d+)\/edit$/,   (q,id) => { const i=Model.Item.get(+id); return i && View.itemForm(i); }],
+    [/^\/gachas$/,               () => View.gachas(Model.Gacha.all())],
+    [/^\/gachas\/new$/,          () => View.gachaForm()],
+    [/^\/gachas\/(\d+)$/,        (q,id) => { const g=Model.Gacha.get(+id); if(!g) return null; const w=lastWin; lastWin=null;
+        return View.gachaShow(g, Model.Gacha.includes(g.id), Model.Item.all(), Model.Trader.all(), Model.Gacha.history(g.id), w); }],
+    [/^\/gachas\/(\d+)\/edit$/,  (q,id) => { const g=Model.Gacha.get(+id); return g && View.gachaForm(g); }],
+    [/^\/traders$/,              () => View.traders(Model.Trader.all())],
+    [/^\/traders\/new$/,         () => View.traderForm()],
+    [/^\/traders\/(\d+)$/,       (q,id) => { const t=Model.Trader.get(+id); if(!t) return null; const r=Model.raw();
+        return View.traderShow(t, Model.Trader.inventory(t.id), Model.Trader.opens(t.id), r.listings.filter(l=>l.trader_id===t.id).reverse(),
+                               r.orders.filter(o=>o.trader_id===t.id).reverse(), Model.Item.all()); }],
+    [/^\/traders\/(\d+)\/edit$/, (q,id) => { const t=Model.Trader.get(+id); return t && View.traderForm(t); }],
+    [/^\/listings$/,             () => View.listings(Model.Listing.all(), Model.buyer(), Model.Cart.ids(Model.buyer()))],
+    [/^\/listings\/new$/,        q => View.listingForm(Model.Trader.all(), num(q.trader), q.trader ? Model.Listing.sellable(+q.trader) : [])],
+    [/^\/cart$/,                 () => { const b=Model.buyer(); return View.cart(b && Model.Trader.get(b), b?Model.Cart.list(b):[], b?Model.Cart.total(b):0); }],
+    [/^\/orders$/,               () => View.orders(Model.Order.all())],
+    [/^\/orders\/(\d+)$/,        (q,id) => { const o=Model.Order.get(+id); return o && View.orderShow(o, Model.Order.listings(o.id), Model.Order.payment(o.id), Model.Order.shipment(o.id)); }],
+  ];
+
+  function renderShop(){
+    document.getElementById('shop').innerHTML = View.shop(Model.Trader.all(), Model.buyer(), Model.Cart.count(Model.buyer()));
+  }
+  function render(){
+    pendingImage = null;
+    const [path, qs=''] = (location.hash.slice(1) || '/').split('?');
+    const q = Object.fromEntries(new URLSearchParams(qs));
+    let html = null;
+    for (const [re, fn] of routes) { const m = path.match(re); if (m) { html = fn(q, ...m.slice(1)); break; } }
+    app.innerHTML = html || '<h1>Page not found</h1><p><a href="#/">Back to home</a></p>';
+    document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', path.startsWith('/'+a.dataset.k)));
+    renderShop();
+    const f = app.querySelector('form'); if (f && f.querySelector('[name=item_type]')) toggleType(f);
+    window.scrollTo(0,0);
+  }
+  const toggleType = f => {
+    const t = f.item_type.value;
+    document.getElementById('card-fields').style.display = t==='Card' ? 'grid' : 'none';
+    document.getElementById('box-fields').style.display  = t==='Boxset' ? 'grid' : 'none';
+  };
+
+  // ---- Talking to the PHP API ----
+  const api = async (method, url, body) => {
+    const r = await fetch('api' + url, {method, headers:{'Content-Type':'application/json'}, body: body===undefined ? undefined : JSON.stringify(body)});
+    let d = {}; try { d = await r.json(); } catch(e) {}
+    if (!r.ok) throw new Error(d.error || 'Request failed (' + r.status + ')');
+    return d;
+  };
+  // Run a write, reload the data, then go to the returned #hash (or just redraw)
+  const act = async (fn, msg) => {
+    try {
+      const next = await fn();
+      await Model.load();
+      if (msg) toast(msg);
+      if (typeof next === 'string' && next !== location.hash) go(next); else render();
+    } catch(e) { toast(e.message); }
+  };
+
+  // ---- Items / Gacha / Traders ----
+  const saveItem = (e,id) => { const f=fd(e); if(pendingImage) f.image=pendingImage;
+    act(async () => { const r = id ? await api('PUT','/items/'+id,f) : await api('POST','/items',f); return '#/items/'+(id||r.id); }, 'Saved'); return false; };
+  const deleteItem = id => { if(confirm('Delete this item?')) act(async () => { await api('DELETE','/items/'+id); return '#/items'; }, 'Item deleted'); };
+
+  const saveGacha = (e,id) => { const f=fd(e); const d={name:f.name.trim(),price:num(f.price),stock:num(f.stock),status:f.status,image:pendingImage};
+    act(async () => { const r = id ? await api('PUT','/gachas/'+id,d) : await api('POST','/gachas',d); return '#/gachas/'+(id||r.id); }, 'Saved'); return false; };
+  const deleteGacha = id => { if(confirm('Delete this machine?')) act(async () => { await api('DELETE','/gachas/'+id); return '#/gachas'; }, 'Machine deleted'); };
+  const addInclude = (e,gid) => { const f=fd(e);
+    act(() => api('PUT','/gachas/'+gid+'/includes/'+f.item_id,{probability:num(f.probability)||1})); return false; };
+  const removeInclude = (gid,iid) => act(() => api('DELETE','/gachas/'+gid+'/includes/'+iid));
+  const openGacha = (e,gid) => { const f=fd(e);
+    act(async () => { const w = await api('POST','/gachas/'+gid+'/open',{trader_id:+f.trader_id});
+      lastWin = {trader:Model.Trader.get(+f.trader_id).name, item:w}; toast('🎉 You got: '+w.name); }); return false; };
+
+  const saveTrader = (e,id) => { const f=fd(e); f.name=f.name.trim();
+    act(async () => { const r = id ? await api('PUT','/traders/'+id,f) : await api('POST','/traders',f);
+      const tid = id || r.id; if (!Model.buyer()) Model.setBuyer(tid); return '#/traders/'+tid; }, 'Saved'); return false; };
+  const deleteTrader = id => { if(confirm('Delete this trader?')) act(async () => { await api('DELETE','/traders/'+id); return '#/traders'; }, 'Trader deleted'); };
+  const addOwn = (e,tid) => { const f=fd(e);
+    act(() => api('POST','/traders/'+tid+'/own',{item_id:+f.item_id, quantity:num(f.quantity)||1}), 'Added to inventory'); return false; };
+
+  // ---- Listings ----
+  const saveListing = (e,seller) => { const ids=[...e.target.querySelectorAll('[name=item_ids]:checked')].map(x=>+x.value); const f=fd(e);
+    act(async () => { await api('POST','/listings',{trader_id:seller, price:num(f.price), item_ids:ids}); return '#/listings'; }, 'Listing created'); return false; };
+  const deleteListing = id => { if(confirm('Delete this listing?')) act(() => api('DELETE','/listings/'+id), 'Listing deleted'); };
+
+  // ---- Cart & checkout ----
+  const setBuyer = v => { Model.setBuyer(+v || null); render(); };
+  const addToCart = lid => { safe(() => { Model.Cart.add(Model.buyer(), lid); toast('Added to cart 🛒'); render(); }); };
+  const buyNow = lid => { if (Model.Cart.has(Model.buyer(), lid)) return go('#/cart');
+    safe(() => { Model.Cart.add(Model.buyer(), lid); go('#/cart'); }); };
+  const removeFromCart = lid => { Model.Cart.remove(Model.buyer(), lid); toast('Removed from cart'); render(); };
+  const checkout = e => { const f=fd(e), b=Model.buyer();
+    act(async () => {
+      const o = await api('POST','/orders',{buyer_id:b, listing_ids:Model.Cart.list(b).map(l=>l.id), address:f.address.trim(), method:f.method, pay_now:!!f.pay_now});
+      Model.Cart.clear(b);
+      toast(f.pay_now ? 'Order placed and paid ✅' : 'Order placed — payment pending'); return '#/orders/'+o.id;
+    }); return false; };
+  const savePayment = (e,id) => { const f=fd(e);
+    act(() => api('PATCH','/orders/'+id+'/payment',{status:f.payment_status}), 'Payment updated'); return false; };
+  const saveShipment = (e,id) => { const f=fd(e);
+    act(() => api('PATCH','/orders/'+id+'/shipment',f), 'Shipment updated'); return false; };
+
+  const exportData = () => { const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(Model.raw())],{type:'application/json'})); a.download='salty-compendium-data.json'; a.click(); };
+
+  // ---- Start ----
+  Model.loadLocal();
+  window.addEventListener('hashchange', render);
+  Model.load().then(render).catch(e => {
+    app.innerHTML = '<h1>Cannot reach the server</h1><div class="panel"><p id="err"></p>' +
+      '<p class="mut">Open <b>http://localhost/gachamart/</b> (not the file itself), start Apache and MySQL in the XAMPP Control Panel, ' +
+      'and check <b>http://localhost/gachamart/api/dump</b> shows JSON.</p></div>';
+    document.getElementById('err').textContent = e.message;
+  });
+  return { render, pickImage, toggleType, saveItem, deleteItem, saveGacha, deleteGacha, addInclude, removeInclude, openGacha,
+           saveTrader, deleteTrader, addOwn, saveListing, deleteListing, setBuyer, addToCart, buyNow, removeFromCart, checkout,
+           savePayment, saveShipment, exportData };
+})();
+</script>
+</body>
+</html>
