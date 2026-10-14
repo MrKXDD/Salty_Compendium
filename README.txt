@@ -8,7 +8,7 @@ salty.sql (this creates the card_marketplace database)
 Insert_info_salty_project.sql (mock data, optional)
 schema_patch.sql
 
-The patch is required: without it, a listing can’t exist before it is ordered, so the shop flow breaks. It also adds the Payment.method, Shipment.address and Image columns. If an import fails, send me the error message.
+The patch is required: without it, a listing can’t exist before it is ordered, so the shop flow breaks. It also adds the Payment.method, Shipment.address and Image columns.
 
 3. Copy the app. Copy the gachamart folder to C:\xampp\htdocs\gachamart\. It holds three files:
 
@@ -28,11 +28,13 @@ Writes: each write goes to the API (POST, PUT, DELETE, PATCH on /api/items, /tra
 Transactions: spinning a gacha, checkout, and payment each run as a single database transaction with row locks. That stops two people taking the last stock or the same listing.
 Cart and “Shopping as”: these stay in the browser’s localStorage, because your schema has no cart table.
 Safety: all queries use prepared statements, so SQL injection is not a concern.
+
 Changes from the earlier version
 Removed buttons: Load sample data, Import JSON and Reset are gone from the footer, because the database is now the source of truth. Use phpMyAdmin to reset or reload data. Export JSON remains.
 Email is required: Trader.Email is NOT NULL UNIQUE in your schema, so the trader form now requires it. A duplicate email gives a clear error message.
 Probabilities are percent: the form field is now labelled “Probability (%)”.
 Extra statuses: the dropdowns now include refunded and returned, which exist in your mock data.
+
 If something goes wrong
 Apache won’t start: port 80 is usually taken by Skype or IIS. Stop that program or change Apache’s port.
 404 on /api/dump: .htaccess is being ignored. Check that mod_rewrite is enabled in httpd.conf, and that the folder’s AllowOverride is set to All. XAMPP’s htdocs is set up this way by default.
